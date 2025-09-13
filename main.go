@@ -33,15 +33,15 @@ func main() {
 
 	// Register the handler function for the "/healthz" endpoint.
 	// This endpoint is typically used for health checks.
-	mux.HandleFunc("/healthz", handlerHealthz)
+	mux.HandleFunc("GET /api/healthz", handlerHealthz)
 
 	// Register the handler function for the "/metrics" endpoint.
     // This endpoint returns the number of hits to the file server.
-	mux.HandleFunc("/metrics", apiCfg.handlerMetrics)
+	mux.HandleFunc("GET /api/metrics", apiCfg.handlerMetrics)
 
 	// Register the handler function for the "/reset" endpoint.
     // This endpoint resets the hit counter to zero.
-	mux.HandleFunc("/reset", apiCfg.handlerMetricsRes)
+	mux.HandleFunc("POST /api/reset", apiCfg.handlerMetricsRes)
 
 	// Create a new HTTP server instance with custom settings.
 	server := &http.Server {
@@ -88,7 +88,7 @@ func (cfg *apiConfig) middlewareMetricsInc(next http.Handler) http.Handler {
 // It resets the hit counter to zero.
 func (cfg *apiConfig) handlerMetricsRes(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	cfg.fileserverHits.Swap(0)
+	cfg.fileserverHits.Store(0)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(http.StatusText(http.StatusOK)))
 }
