@@ -37,11 +37,11 @@ func main() {
 
 	// Register the handler function for the "/metrics" endpoint.
     // This endpoint returns the number of hits to the file server.
-	mux.HandleFunc("GET /api/metrics", apiCfg.handlerMetrics)
+	mux.HandleFunc("GET /admin/metrics", apiCfg.handlerMetrics)
 
 	// Register the handler function for the "/reset" endpoint.
     // This endpoint resets the hit counter to zero.
-	mux.HandleFunc("POST /api/reset", apiCfg.handlerMetricsRes)
+	mux.HandleFunc("POST /admin/reset", apiCfg.handlerMetricsRes)
 
 	// Create a new HTTP server instance with custom settings.
 	server := &http.Server {
@@ -69,10 +69,16 @@ func handlerHealthz(w http.ResponseWriter, req *http.Request) {
 // handlerMetrics responds to requests for the metrics endpoint.
 // It returns the current number of hits to the file server.
 func (cfg *apiConfig) handlerMetrics(w http.ResponseWriter, req *http.Request) {
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	hits := cfg.fileserverHits.Load()
-	w.Write([]byte(fmt.Sprintf("Hits: %d", hits)))
+	w.Write([]byte(fmt.Sprintf(`
+	<html>
+  		<body>
+    	<h1>Welcome, Chirpy Admin</h1>
+    	<p>Chirpy has been visited %d times!</p>
+  		</body>
+	</html>`, hits)))
 }
 
 // middlewareMetricsInc is a middleware that increments the hit counter for each request.
